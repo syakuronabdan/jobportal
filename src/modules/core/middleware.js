@@ -1,3 +1,5 @@
+const validate = require('validate.js');
+
 const apiResponse = () => {
   return (req, res) => {
     const code = res.statusCode;
@@ -18,10 +20,20 @@ const apiErrorResponse = () => {
         status: false,
         code: statusCode,
         message: err.message,
-        data: err.data || {},
+        data: err.data,
     };
     res.status(statusCode).json(response);
   };
 };
 
-module.exports = { apiResponse, apiErrorResponse };
+const validateProp = (constraints, msg) => {
+  return (req, res, next) => {
+    const hasError = validate(req.body, constraints);
+    if (hasError) {
+      next({ message: msg, data: hasError });
+    }
+    return next();
+  };
+};
+
+module.exports = { apiResponse, apiErrorResponse, validateProp };
