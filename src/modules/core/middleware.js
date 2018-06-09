@@ -30,7 +30,7 @@ const validateProp = (constraints, msg) => {
   return (req, res, next) => {
     const hasError = validate(req.body, constraints);
     if (hasError) {
-      next({ message: msg, data: hasError });
+      return next({ message: msg, data: hasError });
     }
     return next();
   };
