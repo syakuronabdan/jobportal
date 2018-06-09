@@ -11,8 +11,8 @@ const sequelize = core.sequelize.db;
 const SALT_ROUND = 8;
 
 const Rank = {
-  A: 1,
-  B: 2
+  B: 1,
+  A: 2
 };
 
 const Applicant = sequelize.define('applicant', {
