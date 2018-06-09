@@ -15,8 +15,8 @@ __MACOSX
 *.jwt.js
 *.local.yml
 
-/config/local.js
-/config/*-local.js
+config/local.json
+config/*-local.json
 
 yarn.lock
 
