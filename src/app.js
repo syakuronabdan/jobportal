@@ -7,12 +7,13 @@ const path = require('path');
 const core = require('./modules/core');
 const user = require('./modules/user');
 const applicant = require('./modules/applicant');
+const company = require('./modules/company');
 
 const app = express();
 
 process.on('unhandledRejection', (err) => {
-    // eslint-disable-next-line no-console
-    console.log('Unhandled Rejection:', err.stack);
+  // eslint-disable-next-line no-console
+  console.log('Unhandled Rejection:', err.stack);
 });
 
 app.use(cors());
@@ -34,19 +35,17 @@ app.set('case sensitive routing', true);
 
 app.use(user.routes);
 app.use(applicant.routes);
-
-// use middleware
-app.use(core.middleware.apiResponse());
+app.use(company.routes);
 
 app.use((req, res, next) => {
-    const err = new Error('Path Not Found');
-    err.code = 404;
-    next(err);
+  const err = { message: 'Not Found' };
+  err.httpStatus = 404;
+  next(err);
 });
 
 app.use(core.middleware.apiErrorResponse());
 
 app.listen(config.port, () => {
-    console.log(`Server started on port ${config.port}`);
+  console.log(`Server started on port ${config.port}`);
 });
 
