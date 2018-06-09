@@ -3,9 +3,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const config = require('config');
-const path = require(path);
+const path = require('path');
 const core = require('./modules/core');
 const user = require('./modules/user');
+const applicant = require('./modules/applicant');
 
 const app = express();
 
@@ -16,10 +17,9 @@ process.on('unhandledRejection', (err) => {
 
 app.use(cors());
 app.use(helmet());
-app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(rootDir, 'public')));
+app.use(express.static(path.join(path.dirname(__dirname), 'public')));
 
 app.set('trust proxy', 1);
 
@@ -33,6 +33,7 @@ app.set('x-powered-by', false);
 app.set('case sensitive routing', true);
 
 app.use(user.routes);
+app.use(applicant.routes);
 
 // use middleware
 app.use(core.middleware.apiResponse());
