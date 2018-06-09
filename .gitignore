@@ -1,0 +1,26 @@
+dist
+build/
+docs/dist
+node_modules
+public/image/*
+!/public/image/.gitkeep
+
+.idea
+.vscode
+.DS_Store
+__MACOSX
+*.log
+*.logs
+*.local.json
+*.jwt.js
+*.local.yml
+
+/config/local.js
+/config/*-local.js
+
+yarn.lock
+
+ecosystem.json
+
+# Ignore redis binary dump (dump.rdb) files
+*.rdb
