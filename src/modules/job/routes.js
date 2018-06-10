@@ -55,4 +55,13 @@ routes.get('/companies/:id/jobs',
   wrap(JobController.listJob),
   apiResponse());
 
+/**
+ * GET /jobs/:id/applicants
+ * View applicants on a job
+ */
+routes.get('/jobs/:id/applicants',
+  jwtAuth(user.model.UserType.COMPANY),
+  wrap(JobController.listApplicant),
+  apiResponse());
+
 module.exports = routes;

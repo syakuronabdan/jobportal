@@ -69,4 +69,14 @@ JobController.listJob = async (req, res, next) => {
   return next();
 };
 
+JobController.listApplicant = async (req, res, next) => {
+  const companyId = req.user.id;
+  const jobId = req.params.id;
+  const job = await Job.findById(jobId);
+  if (job.company_id !== companyId) throw { message: 'Job not found', httpStatus: 400 };
+  const applicants = await JobApplicant.getList({job_id: jobId});
+  req.resData = { data: applicants };
+  return next();
+};
+
 module.exports = { JobController };
