@@ -64,4 +64,32 @@ routes.get('/jobs/:id/applicants',
   wrap(JobController.listApplicant),
   apiResponse());
 
+/**
+ * POST /job-applicants/:id/accept
+ * Accept job proposal
+ */
+routes.post('/job-applicants/:id/accept',
+  jwtAuth(user.model.UserType.COMPANY),
+  wrap(JobController.acceptJob),
+  apiResponse());
+
+/**
+ * POST /job-applicants/:id/complete
+ * Complete job proposal
+ */
+routes.post('/job-applicants/:id/complete',
+  jwtAuth(user.model.UserType.COMPANY),
+  wrap(JobController.completeJob),
+  wrap(JobController.promoteApplicant),
+  apiResponse());
+
+/**
+ * POST /job-applicants/:id/reject
+ * Reject job proposal
+ */
+routes.post('/job-applicants/:id/reject',
+  jwtAuth(user.model.UserType.COMPANY),
+  wrap(JobController.rejectJob),
+  apiResponse());
+
 module.exports = routes;

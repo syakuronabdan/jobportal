@@ -1,7 +1,7 @@
 const moment = require('moment');
 const config = require('config');
 const { Job, JobApplicant } = require('./model');
-const { Rank } = require('../applicant/model');
+const { Rank, Applicant } = require('../applicant/model');
 
 const JobController = {};
 
@@ -78,5 +78,70 @@ JobController.listApplicant = async (req, res, next) => {
   req.resData = { data: applicants };
   return next();
 };
+
+JobController.acceptJob = async (req, res, next) => {
+  const id = req.params.id;
+  const companyId = req.user.id;
+  const job = await JobApplicant.findOne({
+    where: { id, $company_id$: Number(companyId) },
+    include: [{ model: Job, required: true }]
+  } );
+  if (!job) throw { message: 'Job not found', httpStatus: 400 };
+  if (job.rejected_at) throw { message: 'Job has already been rejected', httpStatus: 400 };
+  if (job.accepted_at) throw { message: 'Job applicant already accepted', httpStatus: 400 };
+  await job.update({ accepted_at: moment() });
+  delete job.dataValues.job;
+  req.resData = { data: job.dataValues };
+  return next();
+};
+
+JobController.completeJob = async (req, res, next) => {
+  const id = req.params.id;
+  const companyId = req.user.id;
+  const job = await JobApplicant.findOne({
+    where: { id, $company_id$: Number(companyId) },
+    include: [{ model: Job, required: true }]
+  } );
+  if (!job) throw { message: 'Job not found', httpStatus: 400 };
+  if (job.rejected_at) throw { message: 'Job has already been rejected', httpStatus: 400 };
+  if (!job.accepted_at) throw { message: 'Job has not been accepted', httpStatus: 400 };
+  if (job.completed_at) throw { message: 'Job has already completed', httpStatus: 400 };
+  await job.update({ completed_at: moment() });
+  delete job.dataValues.job;
+  req.resData = { data: job.dataValues };
+  return next();
+};
+
+JobController.promoteApplicant = async (req, res, next) => {
+  const id = req.params.id;
+  const job = await JobApplicant.findOne({ where: { id } });
+  const applicant = await Applicant.findOne({ where: { id: job.applicant_id } });
+  if (applicant.rank_id === Rank.B) {
+    const jobCompleted = await JobApplicant.count({
+      where: { applicant_id: applicant.id, completed_at: {$not: null} },
+      logging: console.log
+    });
+    console.log(jobCompleted);
+    if (jobCompleted >= 10 && applicant.rank_id === Rank.B)
+      await applicant.update({ rank_id: Rank.A });
+  }
+  return next();
+};
+
+JobController.rejectJob = async (req, res, next) => {
+  const id = req.params.id;
+  const companyId = req.user.id;
+  const job = await JobApplicant.findOne({
+    where: { id, $company_id$: Number(companyId) },
+    include: [{ model: Job, required: true }]
+  } );
+  if (!job) throw { message: 'Job not found', httpStatus: 400 };
+  if (job.completed_at) throw { message: 'Job has already completed', httpStatus: 400 };
+  if (job.rejected_at) throw { message: 'Job has already been rejected', httpStatus: 400 };
+  await job.update({ rejected_at: moment() });
+  delete job.dataValues.job;
+  req.resData = { data: job.dataValues };
+  return next();
+}
 
 module.exports = { JobController };

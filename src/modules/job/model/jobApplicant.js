@@ -72,5 +72,6 @@ JobApplicant.getList = (spec) => {
 };
 
 JobApplicant.belongsTo(Applicant);
+JobApplicant.belongsTo(Job);
 
 module.exports = { JobApplicant };
