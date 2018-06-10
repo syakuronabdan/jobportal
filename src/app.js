@@ -8,6 +8,7 @@ const core = require('./modules/core');
 const user = require('./modules/user');
 const applicant = require('./modules/applicant');
 const company = require('./modules/company');
+const job = require('./modules/job');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.set('case sensitive routing', true);
 app.use(user.routes);
 app.use(applicant.routes);
 app.use(company.routes);
+app.use(job.routes);
 
 app.use((req, res, next) => {
   const err = { message: 'Not Found' };
