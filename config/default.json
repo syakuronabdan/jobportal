@@ -10,5 +10,9 @@
   },
   "jwt": {
     "secret": "portal"
+  },
+  "maxApply": {
+    "A": 20,
+    "B": 10
   }
 }
