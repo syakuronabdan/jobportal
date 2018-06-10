@@ -34,6 +34,7 @@ routes.patch('/jobs/:id',
  */
 routes.post('/jobs/:id/apply',
   jwtAuth(user.model.UserType.APPLICANT),
+  validateProp(constraints.apply),
   wrap(JobController.checkApplicant),
   wrap(JobController.apply),
   apiResponse());
