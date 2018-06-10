@@ -28,4 +28,14 @@ routes.patch('/jobs/:id',
   wrap(JobController.update),
   apiResponse());
 
+/**
+ * POST /jobs/:id/apply
+ * Apply for a job
+ */
+routes.post('/jobs/:id/apply',
+  jwtAuth(user.model.UserType.APPLICANT),
+  wrap(JobController.checkApplicant),
+  wrap(JobController.apply),
+  apiResponse());
+
 module.exports = routes;

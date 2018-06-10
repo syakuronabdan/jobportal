@@ -1,7 +1,7 @@
 const constraints = {};
 
 /**
- * Register
+ * Create job
  */
 constraints.create = {
   name: {
@@ -18,6 +18,12 @@ constraints.create = {
   city: {
     presence: true,
     numericality: true
+  }
+};
+
+constraints.apply = {
+  cv_url: {
+    presence: true
   }
 };
 

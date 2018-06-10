@@ -1,4 +1,7 @@
-const { Job } = require('./model');
+const moment = require('moment');
+const config = require('config');
+const { Job, JobApplicant } = require('./model');
+const { Rank } = require('../applicant/model');
 
 const JobController = {};
 
@@ -18,6 +21,37 @@ JobController.update = async (req, res, next) => {
   await Job.update(Job.mapProps(req.body), { where: { id } });
   const job = await Job.findOne({ where: { id } } );
   req.resData = { data: job };
+  return next();
+};
+
+JobController.checkApplicant = async (req, res, next) => {
+  const jobId = req.params.id;
+  const applId = req.user.id;
+  const applied = await JobApplicant.findOne({ where: { job_id: jobId, applicant_id: applId } });
+  if (applied) throw { message: `You've already applied once`, httpStatus: 400 };
+  const startMonth = moment().startOf('month');
+  const applyCount = await JobApplicant.count({
+    where: {
+      applicant_id: applId,
+      created_at: { $gte: startMonth }
+    }
+  });
+  const rank = req.user.rank_id === Rank.A? 'A' : 'B';
+  if (applyCount >= config.maxApply[rank])
+    throw { message: `You've reached your monthly apply quota`, httpStatus: 400 }
+  return next();
+};
+
+JobController.apply = async (req, res, next) => {
+  const jobId = req.params.id;
+  const applId = req.user.id;
+  const data = await JobApplicant.create({
+    job_id: jobId,
+    applicant_id: applId,
+    cv_url: req.body.cv_url,
+    linkedin: req.body.linkedin
+  });
+  req.resData = { data };
   return next();
 };
 
