@@ -16,7 +16,7 @@ const { wrap } = core.utils;
 routes.post('/jobs',
   jwtAuth(user.model.UserType.COMPANY),
   validateProp(constraints.create, 'Create job failed'),
-  JobController.create,
+  wrap(JobController.create),
   apiResponse());
 
 /**
@@ -36,6 +36,23 @@ routes.post('/jobs/:id/apply',
   jwtAuth(user.model.UserType.APPLICANT),
   wrap(JobController.checkApplicant),
   wrap(JobController.apply),
+  apiResponse());
+
+/**
+ * GET /jobs
+ * View posted jobs
+ */
+routes.get('/jobs',
+  wrap(JobController.listJob),
+  apiResponse());
+
+/**
+ * GET /companies/:id/jobs
+ * View posted jobs by a company
+ */
+routes.get('/companies/:id/jobs',
+  jwtAuth(user.model.UserType.COMPANY),
+  wrap(JobController.listJob),
   apiResponse());
 
 module.exports = routes;

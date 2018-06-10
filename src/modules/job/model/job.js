@@ -1,5 +1,9 @@
 const bcrypt = require('bcrypt');
 const { DataTypes } = require('sequelize');
+const { Company } = require('../../company/model');
+const { JobFunction } = require('./jobFunction');
+const { JobType } = require('./jobType');
+const { City } = require('../../city/model');
 
 const core = require('../../core/index');
 
@@ -82,6 +86,30 @@ Job.getById = id => Job.findOne({ where: { id } });
  */
 Job.getAll = (condition = {}) => Job.findAll({ where: condition });
 
+/**
+ * Get list of jobs with its relations
+ */
+Job.getList = (spec) => {
+  const page = spec.page || 1;
+  const limit = 10;
+  const where = {};
+  if (spec.city_id) where.city_id = spec.city_id;
+  if (spec.job_type_id) where.job_type_id = spec.job_type_id;
+  if (spec.min_salary) where.min_salary = { $gte: spec.min_salary };
+  if (spec.min_experience) where.min_experience = { $gte: spec.min_experience };
+  if (spec.name) where.name = { $like: `%${name}%`};
+  if (spec.company_id) where.company_id = spec.company_id;
+  if (spec.is_open !== undefined) where.is_open = spec.is_open;
+  if (spec.is_published !== undefined) where.is_published = spec.is_published;
+
+  return Job.findAndCountAll({
+    where,
+    include: [Company, JobFunction, JobType, City],
+    limit,
+    offset: (page - 1) * limit
+  });
+};
+
 const dbColumns = {
   name: 'name',
   job_function: 'job_function_id',
@@ -100,5 +128,10 @@ const dbColumns = {
   culture: 'culture'
 };
 Job.mapProps = (props) => core.utils.matchDB(props, dbColumns);
+
+Job.belongsTo(Company);
+Job.belongsTo(JobFunction);
+Job.belongsTo(JobType);
+Job.belongsTo(City);
 
 module.exports = { Job };
