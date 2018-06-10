@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const { DataTypes } = require('sequelize');
+const { UserType } = require('../../user/model/index');
 
 const core = require('../../core/index');
 
@@ -78,7 +79,7 @@ Applicant.prototype.toJSON = function ({ withType } = {}) {
   const values = Object.assign({}, this.get());
 
   delete values.password;
-  if (withType) values.type = UserType.COMPANY;
+  if (withType) values.type = UserType.APPLICANT;
   return values;
 };
 
